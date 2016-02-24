@@ -1,6 +1,6 @@
---- config/devd.c.orig	2015-05-19 19:41:49 UTC
+--- config/devd.c.orig	2016-02-22 14:03:46 UTC
 +++ config/devd.c
-@@ -0,0 +1,531 @@
+@@ -0,0 +1,613 @@
 +/*
 + * Copyright (c) 2012 Baptiste Daroussin
 + * Copyright (c) 2013, 2014 Alex Kozlov
@@ -67,23 +67,27 @@
 +OsTimerPtr rtimer;
 +
 +struct hw_type {
-+	const char *driver;
-+	int flag;
-+	const char *xdriver;
++        const char *driver;
++        int (*config_device)(const char *driver, const char *devd_line, InputOption *options, InputAttributes *attrs);
++        int ignore_path;
 +};
 +
++static int get_default_device(const char *driver, const char *devd_line, InputOption *options, InputAttributes *attrs);
++static int get_usb_device(const char *driver, const char *devd_line, InputOption *options, InputAttributes *attrs);
++static int get_psm_device(const char *driver, const char *devd_line, InputOption *options, InputAttributes *attrs);
++
 +static struct hw_type hw_types[] = {
-+	{ "ukbd", ATTR_KEYBOARD, "kbd" },
-+	{ "atkbd", ATTR_KEYBOARD, "kbd" },
-+	{ "kbdmux", ATTR_KEYBOARD, "kbd" },
-+	{ "sysmouse", ATTR_POINTER, "mouse" },
-+	{ "ums", ATTR_POINTER, "mouse" },
-+	{ "psm", ATTR_POINTER, "mouse" },
-+	{ "vboxguest", ATTR_POINTER, "vboxmouse" },
-+	{ "joy", ATTR_JOYSTICK, NULL },
-+	{ "atp", ATTR_TOUCHPAD, NULL },
-+	{ "uep", ATTR_TOUCHSCREEN, NULL },
-+	{ NULL, -1, NULL },
++	{ "ukbd", get_usb_device, 0 },
++	{ "atkbd", get_default_device, 1 },
++	{ "kbdmux", get_default_device, 0 },
++	{ "vboxguest", get_default_device, 0 },
++	{ "sysmouse", get_default_device, 0 },
++	{ "ums", get_usb_device, 0 },
++	{ "psm", get_psm_device, 0 },
++	{ "joy", get_default_device, 0 },
++	{ "atp", get_usb_device, 0 },
++	{ "uep", get_usb_device, 0 },
++	{ NULL, NULL, 0 }
 +};
 +
 +static bool
@@ -137,6 +141,30 @@
 +	return false;
 +}
 +
++static int
++is_path_openable(const char *path)
++{
++	int fd;
++
++	if ((fd = open(path, O_RDONLY)) >= 0) {
++		close(fd);
++	}
++	return fd >= 0;
++}
++
++static char *
++rtrim(char *str)
++{
++    if (str && *str) {
++        char *cp;
++
++        for (cp = str + strlen(str) - 1; isspace(*cp); --cp) {
++            *cp = '\0';
++        }
++    }
++    return str;
++}
++
 +static char *
 +sysctl_get_str(const char *sysctlname)
 +{
@@ -164,17 +192,14 @@
 +static void
 +device_added(const char *devname)
 +{
-+	char path[PATH_MAX];
++	char path[PATH_MAX] = "";
 +	char sysctlname[PATH_MAX];
-+	char *vendor;
 +	char *product = NULL;
 +	char *config_info = NULL;
-+	char *walk;
 +	InputOption *options = NULL;
 +	InputAttributes attrs = { };
 +	DeviceIntPtr dev = NULL;
 +	int i;
-+	int fd;
 +
 +	for (i = 0; hw_types[i].driver != NULL; i++) {
 +		size_t len;
@@ -183,97 +208,42 @@
 +		if (strcmp(devname, hw_types[i].driver) == 0 ||
 +			(strncmp(devname, hw_types[i].driver, len) == 0 &&
 +				isnumber(*(devname + len)))) {
-+			attrs.flags |= hw_types[i].flag;
 +			break;
 +		}
 +	}
 +
-+	if (hw_types[i].driver == NULL || hw_types[i].xdriver == NULL) {
-+		LogMessage(X_INFO, "config/devd: ignoring device %s\n",
++	if (hw_types[i].driver == NULL) {
++		LogMessage(X_INFO, "config/devd: device %s unsupported.\n",
 +				devname);
 +		return;
 +	}
 +
-+	/* Skip keyboard devices if kbdmux is enabled */
-+	if (is_kbdmux && is_console_kbd && hw_types[i].flag & ATTR_KEYBOARD) {
-+		LogMessage(X_INFO, "config/devd: kbdmux is enabled, ignoring device %s\n",
-+				devname);
-+		return;
++	if (!hw_types[i].ignore_path) {
++		snprintf(path, sizeof(path), "/dev/%s", devname);
 +	}
-+
-+	snprintf(path, sizeof(path), "/dev/%s", devname);
 +
 +	options = input_option_new(NULL, "_source", "server/devd");
 +	if (!options)
 +		return;
 +
++	/* Generic device configuration */
 +	snprintf(sysctlname, sizeof(sysctlname), "dev.%s.%s.%%desc",
 +	    hw_types[i].driver, devname + strlen(hw_types[i].driver));
-+	vendor = sysctl_get_str(sysctlname);
-+	if (vendor == NULL) {
-+		options = input_option_new(options, "name", devname);
-+	}
-+	else {
-+		if ((walk = strchr(vendor, ' ')) != NULL) {
-+			walk[0] = '\0';
-+			walk++;
-+			product = walk;
-+			if ((walk = strchr(product, ',')) != NULL)
-+				walk[0] = '\0';
-+		}
-+
-+		attrs.vendor = strdup(vendor);
-+		if (product) {
-+			attrs.product = strdup(product);
-+			options = input_option_new(options, "name", product);
-+		}
-+		else
-+			options = input_option_new(options, "name", "(unnamed)");
-+
-+		free(vendor);
-+	}
-+
++	product = sysctl_get_str(sysctlname);
++	attrs.product = strdup(product != NULL ? product : "(unnamed)");
++	attrs.vendor = strdup("(unnamed)");
 +	/* XXX implement usb_id */
 +	attrs.usb_id = NULL;
 +	attrs.device = strdup(path);
-+	options = input_option_new(options, "driver", hw_types[i].xdriver);
++	options = input_option_new(options, "name", product != NULL ? product : "(unnamed)");
++	options = input_option_new(options, "path", path);
++	options = input_option_new(options, "device", path);
 +
-+	fd = open(path, O_RDONLY);
-+	if (fd > 0) {
-+		close(fd);
-+		options = input_option_new(options, "device", path);
-+	}
-+	else {
-+		if (attrs.flags & ~ATTR_KEYBOARD) {
-+			LogMessage(X_INFO, "config/devd: device %s already opened\n",
-+					 path);
-+
-+			/*
-+			 * Fail if cannot open device, it breaks AllowMouseOpenFail,
-+			 * but it should not matter when config/devd enabled
-+			 */
++	/* Device-specific configuration */
++	if (hw_types[i].config_device) {
++		if (hw_types[i].config_device(hw_types[i].driver, devname, options, &attrs)) {
 +			goto unwind;
 +		}
-+
-+		if (is_console_kbd) {
-+			/*
-+			 * There can be only one keyboard attached to console and
-+			 * it is already added.
-+			 */
-+			LogMessage(X_WARNING, "config/devd: console keyboard is "
-+					"already added, ignoring %s (%s)\n",
-+					attrs.product, path);
-+			goto unwind;
-+		}
-+		else
-+			/*
-+			 * Don't pass "device" option if the keyboard is already
-+			 * attached to the console (ie. open() fails).
-+			 * This would activate a special logic in xf86-input-keyboard.
-+			 * Prevent any other attached to console keyboards being
-+			 * processed. There can be only one such device.
-+			 */
-+			is_console_kbd = true;
 +	}
 +
 +	if (asprintf(&config_info, "devd:%s", devname) == -1) {
@@ -294,7 +264,8 @@
 +	NewInputDeviceRequest(options, &attrs, &dev);
 +
 +unwind:
-+	free(config_info);
++	if (config_info)
++		free(config_info);
 +	input_option_free_list(&options);
 +	free(attrs.usb_id);
 +	free(attrs.product);
@@ -307,6 +278,7 @@
 +{
 +	char *config_info;
 +
++	rtrim(devname);
 +	if (asprintf(&config_info, "devd:%s", devname) == -1)
 +		return;
 +
@@ -479,6 +451,116 @@
 +static void
 +block_handler(void *data, struct timeval **tv, void *read_mask)
 +{
++}
++
++static int get_default_device(const char *driver, const char *devd_line, InputOption *options, InputAttributes *attrs)
++{
++	int retval = 0;
++
++	if (strcmp(driver, "atkbd") == 0) {
++		attrs->flags |= ATTR_KEYBOARD;
++		options = input_option_new(options, "driver", "kbd");
++
++		/* Skip keyboard devices if kbdmux is enabled */
++		if (is_kbdmux && is_console_kbd) {
++			LogMessage(X_INFO, "config/devd: kbdmux is enabled, ignoring device %s\n",
++					devd_line);
++			retval = -1;
++		}
++		else if (attrs->device[0] && !is_path_openable(attrs->device)) {
++			LogMessage(X_INFO, "config/devd: device %s already opened\n",
++					attrs->device);
++			/*
++			 * Fail if cannot open device, it breaks
++			 * AllowMouseOpenFail, but it should not matter when
++			 * config/devd enabled
++			 */
++			retval = -1;
++		}
++		else if (is_console_kbd) {
++			/*
++			 * There can be only one keyboard attached to console and
++			 * it is already added.
++			 */
++			LogMessage(X_WARNING, "config/devd: console keyboard is "
++					"already added, ignoring %s (%s)\n",
++					attrs->product, attrs->device);
++			retval = -1;
++		}
++		else {
++			/*
++			 * Don't pass "device" option if the keyboard
++			 * is already attached to the console (ie.
++			 * open() fails).  This would activate a
++			 * special logic in xf86-input-keyboard.
++			 * Prevent any other attached to console
++			 * keyboards being processed. There can be only
++			 * one such device.
++			 */
++			is_console_kbd = true;
++		}
++
++	} else if (strcmp(driver, "joy") == 0) {
++		attrs->flags |= ATTR_JOYSTICK;
++		options = input_option_new(options, "driver", "joystick");
++	} else {
++		retval = -1;
++	}
++	return retval;
++}
++
++static int get_usb_device(const char *driver, const char *devd_line, InputOption *options, InputAttributes *attrs)
++{
++	int retval = 0;
++
++	if (strcmp(driver, "ukbd") == 0) {
++		attrs->flags |= ATTR_KEYBOARD;
++		options = input_option_new(options, "driver", "kbd");
++	}
++	else if (strcmp(driver, "ums") == 0 || strcmp(driver, "uhid") == 0) {
++		/* Change "path" and "device" to use sysmouse(4) */
++		InputOption *option;
++
++		attrs->flags |= ATTR_POINTER;
++		options = input_option_new(options, "driver", "mouse");
++		option = input_option_find(options, "path");
++		if (option) {
++			input_option_set_value(option, "/dev/sysmouse");
++		}
++		option = input_option_find(options, "device");
++		if (option) {
++			input_option_set_value(option, "/dev/sysmouse");
++		}
++	} else if (strcmp(driver, "uep") == 0) {
++		attrs->flags |= ATTR_TOUCHSCREEN;
++		options = input_option_new(options, "driver", "egalax");
++	} else {
++		retval = -1;
++	}
++	return retval;
++}
++
++static int get_psm_device(const char *driver, const char *devd_line, InputOption *options, InputAttributes *attrs)
++{
++	int retval = 0;
++
++	if (strcmp(driver, "psm") == 0) {
++		char *str;
++
++		if ((str = sysctl_get_str("hw.psm.synaptics.margin_top")) ||
++			(str = sysctl_get_str("dev.psm.synaptics.margin_top")))
++		{
++			free(str);
++			attrs->flags |= ATTR_TOUCHPAD;
++			options = input_option_new(options, "driver", "synaptics");
++		} else {
++			attrs->flags |= ATTR_POINTER;
++			options = input_option_new(options, "driver", "mouse");
++		}
++	} else {
++		retval = -1;
++	}
++	return retval;
 +}
 +
 +int
