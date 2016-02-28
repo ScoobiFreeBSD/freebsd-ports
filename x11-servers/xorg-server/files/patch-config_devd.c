@@ -1,6 +1,6 @@
---- config/devd.c.orig	2016-02-22 14:03:46 UTC
+--- config/devd.c.orig	2016-02-28 02:36:56 UTC
 +++ config/devd.c
-@@ -0,0 +1,613 @@
+@@ -0,0 +1,713 @@
 +/*
 + * Copyright (c) 2012 Baptiste Daroussin
 + * Copyright (c) 2013, 2014 Alex Kozlov
@@ -58,6 +58,8 @@
 +
 +#define DEVD_EVENT_ADD		'+'
 +#define DEVD_EVENT_REMOVE	'-'
++#define DEVD_EVENT_NOTIFY	'!'
++#define DEVD_EVENT_UNKNOWN	'?'
 +
 +#define RECONNECT_DELAY		5 * 1000
 +
@@ -75,6 +77,7 @@
 +static int get_default_device(const char *driver, const char *devd_line, InputOption *options, InputAttributes *attrs);
 +static int get_usb_device(const char *driver, const char *devd_line, InputOption *options, InputAttributes *attrs);
 +static int get_psm_device(const char *driver, const char *devd_line, InputOption *options, InputAttributes *attrs);
++static int get_evdev_device(const char *driver, const char *devd_line, InputOption *options, InputAttributes *attrs);
 +
 +static struct hw_type hw_types[] = {
 +	{ "ukbd", get_usb_device, 0 },
@@ -87,6 +90,7 @@
 +	{ "joy", get_default_device, 0 },
 +	{ "atp", get_usb_device, 0 },
 +	{ "uep", get_usb_device, 0 },
++	{ "input/event", get_evdev_device, 0 },
 +	{ NULL, NULL, 0 }
 +};
 +
@@ -189,10 +193,79 @@
 +	return dest;
 +}
 +
++static int 
++get_nth_word(const char *line, char delim, size_t n, char *word, size_t word_len)
++{
++	const char *cp = line;
++	size_t i;
++
++	LogMessage(X_WARNING, "config/devd: get_%zuth_word: line=\"%s\"\n", n,
++			line);
++	for (i = 0; i <= n; ++i) {
++		if (i > 0) {
++			++cp;
++		}
++		while (*cp && !(*cp != delim && (cp == line || *(cp - 1) == delim))) {
++			++cp;
++		}
++	}
++	if (*cp) {
++		LogMessage(X_WARNING, "config/devd: get_%zuth_word: cp=\"%s\"\n", n,
++				cp);
++		for (i = 0; i < word_len && *cp && *cp != delim; ++i, ++cp) {
++			word[i] = *cp;
++		}
++		word[i] = '\0';
++		LogMessage(X_WARNING, "config/devd: get_%zuth_word: returning word=\"%s\"\n", n, word);
++		return 0;
++	}
++	return -1;
++}
++
++static int
++get_name_value(const char *line, const char *name, char *value, size_t value_len)
++{
++	char token[PATH_MAX];
++	char buf[PATH_MAX];
++	size_t i;
++
++	for (i = 0; get_nth_word(line, ' ', i, token, sizeof(token)) == 0; ++i) {
++		if (get_nth_word(token, '=', 0, buf, sizeof(buf)) == 0 &&
++				strcmp(buf, name) == 0)
++		{
++			return get_nth_word(token, '=', 1, value, value_len);
++		}
++	}
++	return -1;
++}
++
++static int
++match_cdev(const char *line, const char *type, char *cdev, size_t cdev_len)
++{
++//"system=DEVFS subsystem=CDEV type=CREATE cdev=pts/2"
++	char value[PATH_MAX];
++
++	if (get_name_value(line, "system", value, sizeof(value)) == 0 &&
++	    strcmp(value, "DEVFS") == 0)
++	{
++		if (get_name_value(line, "subsystem", value, sizeof(value)) == 0 &&
++		    strcmp(value, "CDEV") == 0)
++		{
++			if (get_name_value(line, "type", value, sizeof(value)) == 0 &&
++			    strcmp(value, type) == 0)
++			{
++				return get_name_value(line, "cdev", cdev, cdev_len);
++			}
++		}
++	}
++	return -1;
++}
++
 +static void
-+device_added(const char *devname)
++device_added(const char *line)
 +{
 +	char path[PATH_MAX] = "";
++	char devname[PATH_MAX];
 +	char sysctlname[PATH_MAX];
 +	char *product = NULL;
 +	char *config_info = NULL;
@@ -201,6 +274,7 @@
 +	DeviceIntPtr dev = NULL;
 +	int i;
 +
++	get_nth_word(line, ' ', 0, devname, sizeof(devname));
 +	for (i = 0; hw_types[i].driver != NULL; i++) {
 +		size_t len;
 +
@@ -262,7 +336,6 @@
 +			attrs.product, path);
 +
 +	NewInputDeviceRequest(options, &attrs, &dev);
-+
 +unwind:
 +	if (config_info)
 +		free(config_info);
@@ -274,10 +347,12 @@
 +}
 +
 +static void
-+device_removed(char *devname)
++device_removed(char *line)
 +{
 +	char *config_info;
++	char devname[PATH_MAX] = "";
 +
++	get_nth_word(line, ' ', 0, devname, sizeof(devname));
 +	rtrim(devname);
 +	if (asprintf(&config_info, "devd:%s", devname) == -1)
 +		return;
@@ -285,6 +360,24 @@
 +	remove_devices("devd", config_info);
 +
 +	free(config_info);
++}
++
++static void
++action_notified(char *line)
++{
++	char devname[PATH_MAX] = "";
++
++	LogMessage(X_INFO, "config/devd: action_notified(\"%s\"): Entered.\n",
++			line);
++	get_nth_word(line, ' ', 0, devname, sizeof(devname));
++	if (match_cdev(line, "CREATE", devname, sizeof(devname)) == 0) {
++	LogMessage(X_INFO, "config/devd: action_notified(\"%s\"): Entered.\n",
++			line);
++		device_added(devname);
++	} else {
++		LogMessage(X_ERROR, "config/devd: action_notified: devname=\"%s\".\n",
++				devname);
++	}
 +}
 +
 +static bool is_kbdmux_enabled(void)
@@ -430,10 +523,6 @@
 +		if (socket_getline(sock_devd, &line) < 0)
 +			return;
 +
-+		walk = strchr(line + 1, ' ');
-+		if (walk != NULL)
-+			walk[0] = '\0';
-+
 +		switch (*line) {
 +		case DEVD_EVENT_ADD:
 +			device_added(line + 1);
@@ -441,7 +530,11 @@
 +		case DEVD_EVENT_REMOVE:
 +			device_removed(line + 1);
 +			break;
++		case DEVD_EVENT_NOTIFY:
++			action_notified(line + 1);
++			break;
 +		default:
++			LogMessage(X_WARNING, "config/devd: Line not handled: \"%s\"\n", line);
 +			break;
 +		}
 +		free(line);
@@ -561,6 +654,13 @@
 +		retval = -1;
 +	}
 +	return retval;
++} 
++
++static int get_evdev_device(const char *driver, const char *devd_line, InputOption *options, InputAttributes *attrs)
++{
++	attrs->flags |= ATTR_TOUCHSCREEN;
++	options = input_option_new(options, "driver", "evdev");
++	return 0;
 +}
 +
 +int
