@@ -1,0 +1,141 @@
+#!/bin/sh
+#
+# Copyright (C) 2013 Brother. Industries, Ltd.
+#                                    Ver1.10
+
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 2 of the License, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+# Place, Suite 330, Boston, MA  02111-1307  USA
+#
+
+if [ -z "${printer_model}" ]; then
+	printer_model="$(echo "${0}" | sed -e 's/^.*brother_lpdwrapper_//')"
+fi
+LOGLEVEL="1"
+LOGCLEVEL="7"
+DEBUG="9"
+NUPENABLE="1"
+LOG_LATESTONLY="1"
+RCFILE="/opt/brother/Printers/${printer_model}/inf/br${printer_model}rc"
+LPD_FILTER="/opt/brother/Printers/${printer_model}/lpd/filter${printer_model}"
+BRCUPSCONFPT1="/opt/brother/Printers/${printer_model}/cupswrapper/brcupsconfpt1"
+LATEST_PRINT_INFO="/tmp/${printer_model}_latest_print_info"
+export BRPRINTERRCFILE="/tmp/br${printer_model}rc_${$}"
+
+log() {
+	loglevel="${1:-0}"; shift
+
+	if [ "${DEBUG}" -gt "${loglevel}" ]; then
+		if [ "${#}" -gt "0" ]; then
+			echo "${*}" >> "${LOGFILE}"
+		else
+			cat >> "${LOGFILE}"
+		fi
+	fi
+}
+
+log0() {
+	log 0 "${@}"
+}
+
+log1() {
+	log 1 "${@}"
+}
+
+log2() {
+	log 2 "${@}"
+}
+
+log3() {
+	log 3 "${@}"
+}
+
+touch "${LATEST_PRINT_INFO}"
+chmod 600 "${LATEST_PRINT_INFO}"
+
+if [ "${DEBUG}" != "0" ]; then
+	LOGFILE="/var/log/cups/brother_lpdwrapper.log"
+else
+	LOGFILE="/dev/null"
+	LOGCLEVEL="0"
+fi
+
+PPDC="$(printenv | grep "PPD=" | sed -e 's/PPD=//')"
+
+if [ -z "${PPDC}" ]; then
+	PPDC="/usr/local/share/ppd/Brother/brother_${printer_model}_printer_en.ppd"
+fi
+
+
+# Write command-line args, $PPD to logfile
+date | log0
+if [ "${LOGFILE}" != "/dev/null" ]; then
+	if [  "${LOG_LATESTONLY}" == "1" ]; then
+		rm -f "${LOGFILE}"
+	fi
+	for i in 0 1 2 3 4 5 6; do
+		eval log2 "arg[${i}] = \\\"\$${i}\\\""
+	done >> "${LOGFILE}"
+	log2 "PPD  = \"${PPD}\""
+fi
+
+# Ensure lpd/filter exists
+if [ ! -e "${LPD_FILTER}" ]; then
+    echo "ERROR: ${LPD_FILTER} does not exist" | tee -a "${LATEST_PRINT_INFO}" | log0
+    exit 30
+fi
+
+cp "${RCFILE}" "${BRPRINTERRCFILE}"
+chmod 777 "${BRPRINTERRCFILE}"
+
+INPUT_TEMP_PS="$(mktemp /tmp/br_input_ps.XXXXXX)"
+
+nup="cat"
+if echo "${5}" | grep -q 'Nup=' && [ "${NUPENABLE}" != "0" ]; then
+	if psnup --version 1>/dev/null 2>&1; then
+		case "${5}" in
+			*Nup=64*) nup="psnup -64" ;;
+			*Nup=32*) nup="psnup -32" ;;
+			*Nup=25*) nup="psnup -25" ;;
+			*Nup=16*) nup="psnup -16" ;;
+			*Nup=8*)  nup="psnup -8"  ;;
+			*Nup=6*)  nup="psnup -6"  ;;
+			*Nup=4*)  nup="psnup -4"  ;;
+			*Nup=2*)  nup="psnup -2"  ;;
+			*Nup=1*)  nup="cat"       ;;
+		esac
+	fi
+fi
+log2 "NUP=\"${nup}\""
+if [ "${#}" -ge 7 ]; then
+	cat "${6}"  | ${nup} > "${INPUT_TEMP_PS}"
+else
+	cat         | ${nup} > "${INPUT_TEMP_PS}"
+fi
+
+CUPSOPTION="$(echo "${5} Copies=${4}" | sed -e 's/BrMirror/MirrorPrint/' -e 's/Br\(Chain\|Brightness\|Contrast\|HalfCut\|Sheets\)/\1/' -e 's/BrAutoTapeCut/AutoCut/' -e 's/BrHalftonePattern/Halftone/' -e 's/multiple-document-handling/Collate/' -e 's/separate-documents-collated-copies/ON/' -e 's/separate-documents-uncollated-copies/OFF/')"
+if [ -x "${BRCUPSCONFPT1}" ]; then
+	"${BRCUPSCONFPT1}" "${printer_name}" "${PPDC}" "${LOGCLEVEL}" "${CUPSOPTION}" "${printer_model}" "${BRPRINTERRCFILE}" | log0
+fi
+
+cat "${INPUT_TEMP_PS}" | "${LPD_FILTER}"
+echo "${BRPRINTERRCFILE}:" >> "${LATEST_PRINT_INFO}"
+cat  "${BRPRINTERRCFILE}"  >> "${LATEST_PRINT_INFO}"
+rm -f "${BRPRINTERRCFILE}"
+
+echo | log2
+echo "    ------PostScript Data Start------" | log2
+cat "${INPUT_TEMP_PS}" | log2
+echo "     ------PostScript Data End------" | log2
+rm -f "${INPUT_TEMP_PS}"
+exit 0
