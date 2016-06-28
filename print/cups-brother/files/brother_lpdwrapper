@@ -21,14 +21,13 @@
 if [ -z "${printer_model}" ]; then
 	printer_model="$(echo "${0}" | sed -e 's/^.*brother_lpdwrapper_//')"
 fi
-LOGLEVEL="1"
 LOGCLEVEL="7"
 DEBUG="9"
 NUPENABLE="1"
 LOG_LATESTONLY="1"
 RCFILE="/opt/brother/Printers/${printer_model}/inf/br${printer_model}rc"
 LPD_FILTER="/opt/brother/Printers/${printer_model}/lpd/filter${printer_model}"
-BRCUPSCONFPT1="/opt/brother/Printers/${printer_model}/cupswrapper/brcupsconfpt1"
+BRCUPSCONFPT1="/usr/local/bin/brcupsconfpt1"
 LATEST_PRINT_INFO="/tmp/${printer_model}_latest_print_info"
 export BRPRINTERRCFILE="/tmp/br${printer_model}rc_${$}"
 
@@ -114,6 +113,8 @@ if echo "${5}" | grep -q 'Nup=' && [ "${NUPENABLE}" != "0" ]; then
 			*Nup=2*)  nup="psnup -2"  ;;
 			*Nup=1*)  nup="cat"       ;;
 		esac
+	else
+		echo "ERROR: psnup not found." | tee -a "${LATEST_PRINT_INFO}" | log0
 	fi
 fi
 log2 "NUP=\"${nup}\""
@@ -125,6 +126,7 @@ fi
 
 CUPSOPTION="$(echo "${5} Copies=${4}" | sed -e 's/BrMirror/MirrorPrint/' -e 's/Br\(Chain\|Brightness\|Contrast\|HalfCut\|Sheets\)/\1/' -e 's/BrAutoTapeCut/AutoCut/' -e 's/BrHalftonePattern/Halftone/' -e 's/multiple-document-handling/Collate/' -e 's/separate-documents-collated-copies/ON/' -e 's/separate-documents-uncollated-copies/OFF/')"
 if [ -x "${BRCUPSCONFPT1}" ]; then
+	echo "Executing \"${BRCUPSCONFPT1}\" \"${printer_name}\" \"${PPDC}\" \"${LOGCLEVEL}\" \"${CUPSOPTION}\" \"${printer_model}\" \"${BRPRINTERRCFILE}\"..." | tee -a "${LATEST_PRINT_INFO}" | log0
 	"${BRCUPSCONFPT1}" "${printer_name}" "${PPDC}" "${LOGCLEVEL}" "${CUPSOPTION}" "${printer_model}" "${BRPRINTERRCFILE}" | log0
 fi
 
