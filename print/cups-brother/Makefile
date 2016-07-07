@@ -49,4 +49,15 @@ do-install:
 	${MKDIR} ${STAGEDIR}${LOCALBASE}/libexec/cups/filter
 	${INSTALL_SCRIPT} files/brother_lpdwrapper ${STAGEDIR}${LOCALBASE}/libexec/cups/filter/brother_lpdwrapper_${printer_model}
 
+get_models:${WRKDIR}/download_prn.html
+
+${WRKDIR}/download_prn.html:
+	#${MKDIR} "${WRKDIR}"
+	#${FETCH_CMD} -o "${WRKDIR}/download_prn.html" http://support.brother.com/g/s/id/linux/en/download_prn.html
+
+Makefile.options: ${WRKDIR}/download_prn.html files/mkMakefile.options
+	files/mkMakefile.options "${WRKDIR}/download_prn.html" "${@}"
+
+.include "Makefile.options"
+
 .include <bsd.port.mk>
