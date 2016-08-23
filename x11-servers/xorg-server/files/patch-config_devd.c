@@ -1,6 +1,6 @@
 --- config/devd.c.orig	2016-02-28 02:36:56 UTC
 +++ config/devd.c
-@@ -0,0 +1,713 @@
+@@ -0,0 +1,709 @@
 +/*
 + * Copyright (c) 2012 Baptiste Daroussin
 + * Copyright (c) 2013, 2014 Alex Kozlov
@@ -199,8 +199,6 @@
 +	const char *cp = line;
 +	size_t i;
 +
-+	LogMessage(X_WARNING, "config/devd: get_%zuth_word: line=\"%s\"\n", n,
-+			line);
 +	for (i = 0; i <= n; ++i) {
 +		if (i > 0) {
 +			++cp;
@@ -210,13 +208,10 @@
 +		}
 +	}
 +	if (*cp) {
-+		LogMessage(X_WARNING, "config/devd: get_%zuth_word: cp=\"%s\"\n", n,
-+				cp);
 +		for (i = 0; i < word_len && *cp && *cp != delim; ++i, ++cp) {
 +			word[i] = *cp;
 +		}
 +		word[i] = '\0';
-+		LogMessage(X_WARNING, "config/devd: get_%zuth_word: returning word=\"%s\"\n", n, word);
 +		return 0;
 +	}
 +	return -1;
@@ -523,7 +518,8 @@
 +		if (socket_getline(sock_devd, &line) < 0)
 +			return;
 +
-+		switch (*line) {
++		LogMessage(X_WARNING, "config/devd: Got devd event: \"%s\"\n", line);
++		switch (line[0]) {
 +		case DEVD_EVENT_ADD:
 +			device_added(line + 1);
 +			break;
@@ -534,7 +530,7 @@
 +			action_notified(line + 1);
 +			break;
 +		default:
-+			LogMessage(X_WARNING, "config/devd: Line not handled: \"%s\"\n", line);
++			LogMessage(X_WARNING, "config/devd: Event 0x%02x ('%c') not handled: \"%s\"\n", line[0], line[0], line);
 +			break;
 +		}
 +		free(line);
