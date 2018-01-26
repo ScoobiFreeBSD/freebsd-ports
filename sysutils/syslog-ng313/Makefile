@@ -3,11 +3,12 @@
 
 PORTNAME=	syslog-ng
 DISTVERSION=	3.13.2
+PORTREVISION=	2
 CATEGORIES=	sysutils
 DISTFILES=	syslog-ng-${DISTVERSION}.tar.gz
 MASTER_SITES=	https://github.com/balabit/syslog-ng/releases/download/syslog-ng-${DISTVERSION}/
 .if !defined(MASTERDIR)
-PKGNAMESUFFIX=	312
+PKGNAMESUFFIX=	313
 .endif
 
 MAINTAINER=	cy@FreeBSD.org
@@ -26,7 +27,7 @@ CONFLICTS?=	syslog-ng-[0-9]* syslog-ng[0-9]-[0-9]* \
 WRKSRC=		${WRKDIR}/${PORTNAME}-${DISTVERSION}
 
 MAKE_JOBS_UNSAFE=	yes
-OPTIONS_DEFINE=	TCP_WRAPPERS SQL SPOOF IPV6 SMTP JSON GEOIP GEOIP2 DOCS REDIS JAVA PYTHON MONGO CURL JAVA_MOD
+OPTIONS_DEFINE=	TCP_WRAPPERS SQL SPOOF IPV6 SMTP JSON GEOIP GEOIP2 DOCS REDIS JAVA PYTHON MONGO CURL JAVA_MOD AMQP
 OPTIONS_DEFAULT=	JSON
 TCP_WRAPPERS_DESC=	Build with TCP Wrappers
 SQL_DESC=		Build with database (libdbi) support
@@ -40,6 +41,7 @@ JAVA_DESC=		Build with Java support (no modules)
 JAVA_MOD_DESC=		Build with Java modules (needs Maven / Internet access)
 PYTHON_DESC=		Build with Python 2.7 support
 CURL_DESC=		Build with Curl HTTP support
+AMQP_DESC=		Build with AMQP support
 
 USES=		autoreconf:build gmake libtool pathfix pkgconfig ssl \
 		gettext-runtime python shebangfix
@@ -68,8 +70,10 @@ SPOOF_CONFIGURE_ON=		--with-libnet=/usr/local/bin
 SPOOF_CONFIGURE_ENV=		LIBNET_CFLAGS="-I/usr/local/include" \
 				LIBNET_LIBS="-L/usr/local/lib -lnet"
 
-
 IPV6_CONFIGURE_ENABLE=		ipv6
+
+AMQP_CONFIGURE_ENABLE=		amqp
+AMQP_PLIST_FILES=		lib/syslog-ng/libafamqp.so
 
 GEOIP_CONFIGURE_ENABLE=		geoip
 GEOIP_LIB_DEPENDS=		libGeoIP.so:net/GeoIP

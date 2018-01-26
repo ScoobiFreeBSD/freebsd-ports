@@ -30,6 +30,7 @@
     SUBDIR += chibi-scheme
     SUBDIR += chicken
     SUBDIR += cilkplus
+    SUBDIR += cim
     SUBDIR += cint
     SUBDIR += cjs
     SUBDIR += clang-devel
@@ -265,7 +266,7 @@
     SUBDIR += polyml
     SUBDIR += ptoc
     SUBDIR += pure
-    SUBDIR += py-clojure
+    SUBDIR += py-clojure_py
     SUBDIR += py-hy
     SUBDIR += py-mx-base
     SUBDIR += py-prolog
@@ -302,6 +303,7 @@
     SUBDIR += ruby22
     SUBDIR += ruby23
     SUBDIR += ruby24
+    SUBDIR += ruby25
     SUBDIR += runawk
     SUBDIR += rust
     SUBDIR += rust-nightly
@@ -327,6 +329,7 @@
     SUBDIR += smalltalk
     SUBDIR += smlnj
     SUBDIR += snobol4
+    SUBDIR += solidity
     SUBDIR += spidermonkey17
     SUBDIR += spidermonkey170
     SUBDIR += spidermonkey185

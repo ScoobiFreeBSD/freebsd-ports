@@ -458,6 +458,7 @@
     SUBDIR += joequake
     SUBDIR += jools
     SUBDIR += jtans
+    SUBDIR += jumpnbump
     SUBDIR += jutils
     SUBDIR += jvgs
     SUBDIR += jzip
@@ -609,6 +610,7 @@
     SUBDIR += minerbold
     SUBDIR += minetest
     SUBDIR += minetest_game
+    SUBDIR += minilens
     SUBDIR += mirrormagic
     SUBDIR += miscom
     SUBDIR += mkgichessclub
@@ -694,6 +696,7 @@
     SUBDIR += opencity
     SUBDIR += openclaw
     SUBDIR += openclonk
+    SUBDIR += opendungeons
     SUBDIR += opengfx
     SUBDIR += openglad
     SUBDIR += openjazz

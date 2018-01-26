@@ -215,9 +215,9 @@ PLIST_SUB+=	PHP_EXT_DIR=${PHP_EXT_DIR}
 SUB_LIST+=	PHP_EXT_DIR=${PHP_EXT_DIR}
 
 .  if ${php_ARGS:Mphpize} || ${php_ARGS:Mext} || ${php_ARGS:Mzend}
-BUILD_DEPENDS+=	${PHPBASE}/bin/phpize:${PHP_PORT}
+BUILD_DEPENDS+=	${PHPBASE}/bin/phpize:${PHP_PORT} \
+		autoconf>0:devel/autoconf
 GNU_CONFIGURE=	yes
-USE_AUTOTOOLS+=	autoconf:env
 CONFIGURE_ARGS+=--with-php-config=${PHPBASE}/bin/php-config
 
 configure-message: phpize-message do-phpize
@@ -340,7 +340,11 @@ intl_DEPENDS=	devel/pecl-intl
 json_DEPENDS=	devel/php${PHP_VER}-json
 ldap_DEPENDS=	net/php${PHP_VER}-ldap
 mbstring_DEPENDS=	converters/php${PHP_VER}-mbstring
+.    if ${PHP_VER} >= 72
+mcrypt_DEPENDS=	security/pecl-mcrypt
+.    else
 mcrypt_DEPENDS=	security/php${PHP_VER}-mcrypt
+.    endif
 .    if ${PHP_VER} >= 70
 memcache_DEPENDS=	databases/php${PHP_VER}-memcache
 .    else
@@ -382,6 +386,7 @@ simplexml_DEPENDS=	textproc/php${PHP_VER}-simplexml
 snmp_DEPENDS=	net-mgmt/php${PHP_VER}-snmp
 soap_DEPENDS=	net/php${PHP_VER}-soap
 sockets_DEPENDS=net/php${PHP_VER}-sockets
+sodium_DEPENDS=	security/php${PHP_VER}-sodium
 spl_DEPENDS=	devel/php${PHP_VER}-spl
 sqlite_DEPENDS=	databases/php${PHP_VER}-sqlite
 sqlite3_DEPENDS=databases/php${PHP_VER}-sqlite3

@@ -3,6 +3,7 @@
 
     COMMENT = Audio tools
 
+    SUBDIR += GxSwitchlessWah-lv2
     SUBDIR += HVSC-Update
     SUBDIR += Maaate
     SUBDIR += aacgain
@@ -53,7 +54,6 @@
     SUBDIR += baresip
     SUBDIR += baudline
     SUBDIR += bcg729
-    SUBDIR += beast
     SUBDIR += beep
     SUBDIR += beets
     SUBDIR += blop
@@ -68,7 +68,6 @@
     SUBDIR += carla
     SUBDIR += cava
     SUBDIR += ccaudio2
-    SUBDIR += cd-console
     SUBDIR += cd-discid
     SUBDIR += cd2mp3
     SUBDIR += cddb-bundle
@@ -143,6 +142,7 @@
     SUBDIR += faac
     SUBDIR += faad
     SUBDIR += fapg
+    SUBDIR += faust
     SUBDIR += fcplay
     SUBDIR += fdk-aac
     SUBDIR += fdmf
@@ -178,6 +178,7 @@
     SUBDIR += flake
     SUBDIR += flite
     SUBDIR += fluid-soundfont
+    SUBDIR += fluidplug-lv2
     SUBDIR += fluidsynth
     SUBDIR += fluidsynth-dssi
     SUBDIR += fmit
@@ -323,7 +324,6 @@
     SUBDIR += hs-libmpd
     SUBDIR += hts_engine-API
     SUBDIR += hydrogen
-    SUBDIR += hydrogen-devel
     SUBDIR += icecast-kh
     SUBDIR += icecast2
     SUBDIR += icegenerator
@@ -370,7 +370,6 @@
     SUBDIR += ladspa
     SUBDIR += lame
     SUBDIR += lash
-    SUBDIR += last.fm
     SUBDIR += lastfm-desktop
     SUBDIR += liba52
     SUBDIR += libaacplus
@@ -622,11 +621,13 @@
     SUBDIR += p5-tagged
     SUBDIR += p5-xmms2
     SUBDIR += pacpl
+    SUBDIR += padthv1-lv2
     SUBDIR += paman
     SUBDIR += paprefs
     SUBDIR += patchage
     SUBDIR += pavucontrol
     SUBDIR += pavumeter
+    SUBDIR += pc-mixer
     SUBDIR += pd
     SUBDIR += pd-cyclone
     SUBDIR += pear-Text_Spell_Audio
@@ -685,6 +686,7 @@
     SUBDIR += py-speex
     SUBDIR += py-tagpy
     SUBDIR += py-vorbis
+    SUBDIR += py-wavio
     SUBDIR += py-xmms2
     SUBDIR += pytone
     SUBDIR += qjackctl
@@ -715,7 +717,6 @@
     SUBDIR += rubberband
     SUBDIR += ruby-smf
     SUBDIR += ruby-taglib
-    SUBDIR += ruby-xmms2
     SUBDIR += rubygem-librmpd
     SUBDIR += rubygem-ruby-mp3info
     SUBDIR += rubygem-ruby-ogginfo
@@ -725,6 +726,7 @@
     SUBDIR += sbagen
     SUBDIR += sc3-plugins
     SUBDIR += schismtracker
+    SUBDIR += screcord-lv2
     SUBDIR += scrobbler
     SUBDIR += sdl2_mixer
     SUBDIR += sdl_mixer

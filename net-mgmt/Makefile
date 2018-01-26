@@ -123,6 +123,7 @@
     SUBDIR += lldpd
     SUBDIR += mbrowse
     SUBDIR += mdata-client
+    SUBDIR += metronome
     SUBDIR += mk-livestatus
     SUBDIR += monitoring-plugins
     SUBDIR += mrtg
@@ -195,8 +196,6 @@
     SUBDIR += nfsen
     SUBDIR += ng_ipacct
     SUBDIR += nitpicker
-    SUBDIR += nrpe
-    SUBDIR += nrpe-ssl
     SUBDIR += nrpe3
     SUBDIR += nsca
     SUBDIR += nsca-client
@@ -296,6 +295,7 @@
     SUBDIR += pnp-icinga2
     SUBDIR += portmon
     SUBDIR += prometheus
+    SUBDIR += prometheus-collectd-exporter
     SUBDIR += pushgateway
     SUBDIR += py-adal
     SUBDIR += py-dnsdiag

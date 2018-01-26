@@ -6,7 +6,6 @@
     SUBDIR += 3dm
     SUBDIR += 44bsd-more
     SUBDIR += 915resolution
-    SUBDIR += DTraceToolkit
     SUBDIR += LPRng
     SUBDIR += LPRngTool
     SUBDIR += UEFITool
@@ -161,6 +160,7 @@
     SUBDIR += chyves
     SUBDIR += cinnamon-control-center
     SUBDIR += cinnamon-settings-daemon
+    SUBDIR += circonus-agent
     SUBDIR += ciso
     SUBDIR += ciso-maker
     SUBDIR += ck4up
@@ -187,8 +187,9 @@
     SUBDIR += consolehm
     SUBDIR += consolekit2
     SUBDIR += consul
-    SUBDIR += consul_exporter
     SUBDIR += consul-alerts
+    SUBDIR += consul_exporter
+    SUBDIR += container-diff
     SUBDIR += contractor
     SUBDIR += copytape
     SUBDIR += coreutils
@@ -208,6 +209,7 @@
     SUBDIR += curly
     SUBDIR += currtime
     SUBDIR += cw
+    SUBDIR += DTraceToolkit
     SUBDIR += daa2iso
     SUBDIR += dae
     SUBDIR += daemonize
@@ -407,6 +409,7 @@
     SUBDIR += gkrellm2
     SUBDIR += gkrelltop
     SUBDIR += gksu
+    SUBDIR += glogg
     SUBDIR += gnome-control-center
     SUBDIR += gnome-device-manager
     SUBDIR += gnome-mount
@@ -417,6 +420,7 @@
     SUBDIR += gnome-system-monitor
     SUBDIR += gnome_subr
     SUBDIR += goaccess
+    SUBDIR += google-compute-engine-oslogin
     SUBDIR += goss
     SUBDIR += gpart
     SUBDIR += gpte
@@ -696,6 +700,7 @@
     SUBDIR += node_exporter
     SUBDIR += nomad
     SUBDIR += npadmin
+    SUBDIR += nq
     SUBDIR += nrg2iso
     SUBDIR += nut
     SUBDIR += nvclock
@@ -853,6 +858,7 @@
     SUBDIR += polkit-kde
     SUBDIR += polkit-qt
     SUBDIR += polkit-qt5
+    SUBDIR += pot
     SUBDIR += powerdxx
     SUBDIR += powerman
     SUBDIR += powermon
@@ -889,6 +895,7 @@
     SUBDIR += py-crontab
     SUBDIR += py-diffoscope
     SUBDIR += py-dirsync
+    SUBDIR += py-distro
     SUBDIR += py-dlipower
     SUBDIR += py-docker
     SUBDIR += py-drmaa
@@ -933,6 +940,7 @@
     SUBDIR += py-zfs
     SUBDIR += pydf
     SUBDIR += qchroot
+    SUBDIR += qdirstat
     SUBDIR += qjail
     SUBDIR += qjail4
     SUBDIR += qlogtools
@@ -1114,6 +1122,7 @@
     SUBDIR += smenu
     SUBDIR += smp_utils
     SUBDIR += snap
+    SUBDIR += snooze
     SUBDIR += snowlog
     SUBDIR += socket
     SUBDIR += socklog
@@ -1191,16 +1200,18 @@
     SUBDIR += tracker
     SUBDIR += tree
     SUBDIR += tren
+    SUBDIR += trueos-libqt5
     SUBDIR += ts
     SUBDIR += tss
     SUBDIR += tty-clock
     SUBDIR += ttyd
     SUBDIR += ttyload
-    SUBDIR += trueos-libqt5
     SUBDIR += tuptime
     SUBDIR += tw_cli
+    SUBDIR += twmn
     SUBDIR += tzdialog
     SUBDIR += u-boot-a13-olinuxino
+    SUBDIR += u-boot-a64-olinuxino
     SUBDIR += u-boot-bananapi
     SUBDIR += u-boot-bananapim2
     SUBDIR += u-boot-beaglebone
@@ -1217,7 +1228,9 @@
     SUBDIR += u-boot-olimex-a20-som-evb
     SUBDIR += u-boot-olinuxino-lime
     SUBDIR += u-boot-orangepi-one
+    SUBDIR += u-boot-orangepi-pc2
     SUBDIR += u-boot-orangepi-plus-2e
+    SUBDIR += u-boot-orangepi-zero
     SUBDIR += u-boot-pandaboard
     SUBDIR += u-boot-pcduino3
     SUBDIR += u-boot-pine64
@@ -1226,6 +1239,7 @@
     SUBDIR += u-boot-rpi3
     SUBDIR += u-boot-sinovoip-bpi-m3
     SUBDIR += u-boot-sopine
+    SUBDIR += u-boot-tools
     SUBDIR += u-boot-utilite
     SUBDIR += u-boot-wandboard
     SUBDIR += u-boot-zedboard
@@ -1253,6 +1267,7 @@
     SUBDIR += usb_modeswitch
     SUBDIR += usbhid-dump
     SUBDIR += usbhotkey
+    SUBDIR += usbtop
     SUBDIR += usbutils
     SUBDIR += uschedule
     SUBDIR += userinfo
@@ -1281,6 +1296,7 @@
     SUBDIR += vpnc-scripts
     SUBDIR += vstrip
     SUBDIR += vttest
+    SUBDIR += vzvol
     SUBDIR += wait_on
     SUBDIR += warden
     SUBDIR += watchdog
