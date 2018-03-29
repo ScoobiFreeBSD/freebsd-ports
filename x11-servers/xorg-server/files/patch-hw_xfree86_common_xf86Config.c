@@ -1,6 +1,15 @@
 --- hw/xfree86/common/xf86Config.c.orig	2016-07-19 17:14:30 UTC
 +++ hw/xfree86/common/xf86Config.c
-@@ -1410,13 +1410,16 @@ checkCoreInputDevices(serverLayoutPtr se
+@@ -1169,7 +1169,7 @@ checkCoreInputDevices(serverLayoutPtr servlayoutp, Boo
+     XF86ConfInputRec defPtr, defKbd;
+     MessageType from = X_DEFAULT;
+ 
+-    const char *mousedrivers[] = { "mouse", "synaptics", "evdev", "vmmouse",
++    const char *mousedrivers[] = { "synaptics", "mouse", "evdev", "vmmouse",
+         "void", NULL
+     };
+ 
+@@ -1410,13 +1410,16 @@ checkCoreInputDevices(serverLayoutPtr servlayoutp, Boo
      }
  
      if (!xf86Info.forceInputDevices && !(foundPointer && foundKeyboard)) {
