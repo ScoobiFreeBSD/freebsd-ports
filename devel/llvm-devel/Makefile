@@ -59,12 +59,7 @@ OPTIONS_SUB=	yes
 PLIST_FILES=
 
 CLANG_DESC=	Build clang
-CLANG_EXTRA_PATCHES= \
-	${PATCHDIR}/clang-patch-fformat_extensions.diff \
-	${PATCHDIR}/clang-patch-fopenmp.diff \
-	${PATCHDIR}/clang-patch-tools_clang_tools_clang-format_clang-format.py \
-	${PATCHDIR}/clang-patch-tools_clang_tools_clang-format_clang-format-sublime.py \
-	${PATCHDIR}/clang-patch-tools_clang_tools_clang-format_git-clang-format
+CLANG_EXTRA_PATCHES=	${PATCHDIR}/clang
 CLANG_CONFLICTS_INSTALL=	clang-devel-3.[1234567]*
 CLANG_GH_PROJECT=	clang:clang
 CLANG_GH_SUBDIR=	tools/clang:clang
@@ -76,7 +71,8 @@ COMPILER_RT_DESC=	Sanitizer libraries
 COMPILER_RT_IMPLIES=	CLANG
 COMPILER_RT_GH_PROJECT=	compiler-rt:compiler_rt
 COMPILER_RT_GH_TAGNAME=	${COMPILER_RT_COMMIT}:compiler_rt
-COMPILER_RT_PLIST_FILES=${_COMPILER_RT_LIBS:S|^|${_CRTLIBDIR}/|}
+COMPILER_RT_PLIST_FILES=${_COMPILER_RT_LIBS:S|^|${_CRTLIBDIR}/|} \
+			${_COMPILER_RT_BLACKLISTS:S|^|${_CRTBLDIR}/|}
 DOCS_PORTDOCS=		llvm
 DOCS_CMAKE_ON=		-DLLVM_ENABLE_SPHINX=ON \
 			-DSPHINX_WARNINGS_AS_ERRORS=OFF \
@@ -104,8 +100,7 @@ OPENMP_CONFLICTS_INSTALL=	libiomp5-devel-*
 OPENMP_GH_PROJECT=	openmp:openmp
 OPENMP_GH_SUBDIR=	projects/openmp:openmp
 OPENMP_GH_TAGNAME=	${OPENMP_COMMIT}:openmp
-OPENMP_EXTRA_PATCHES= \
-	${PATCHDIR}/openmp-patch-bug32279
+OPENMP_EXTRA_PATCHES=	${PATCHDIR}/openmp
 GOLD_DESC=		Build the LLVM Gold plugin for LTO
 GOLD_CMAKE_ON=		-DLLVM_BINUTILS_INCDIR=${LOCALBASE}/include
 GOLD_BUILD_DEPENDS=	${LOCALBASE}/bin/ld.gold:devel/binutils
@@ -119,6 +114,7 @@ PLIST_SUB+=	LLVM_LIB_VER=${LLVM_MAJOR:C/\..*//} \
 		LLVM_RELEASE=${LLVM_RELEASE}
 
 COMMANDS=	bugpoint \
+		dsymutil \
 		llc \
 		lli \
 		llvm-ar \
@@ -230,7 +226,7 @@ CLANG_PATTERN=	(c-index-test|clang|scan-|Reporter.py|ScanView.py|scanview.css|so
 .endif
 
 .if ${PORT_OPTIONS:MCOMPILER_RT}
-COMPILER_RT_PATTERN=	(_blacklist.txt|sanitizer|include.xray)
+COMPILER_RT_PATTERN=	(sanitizer|include.xray)
 .endif
 
 .if ${PORT_OPTIONS:MLIT}
@@ -273,7 +269,7 @@ PLIST_SUB+=	OPENMP="@comment "
 MAN1SRCS+=	bugpoint.1 dsymutil.1 llc.1 lli.1 llvm-ar.1 llvm-as.1 \
 		llvm-bcanalyzer.1 llvm-build.1 llvm-config.1 llvm-cov.1 \
 		llvm-diff.1 llvm-dis.1 llvm-dwarfdump.1 \
-		llvm-extract.1 llvm-lib.1 llvm-link.1 llvm-nm.1 \
+		llvm-extract.1 llvm-lib.1 llvm-link.1 llvm-mca.1 llvm-nm.1 \
 		llvm-pdbutil.1 \
 		llvm-profdata.1 llvm-readobj.1 llvm-stress.1 llvm-symbolizer.1 \
 		opt.1 tblgen.1
@@ -282,6 +278,7 @@ MAN1SRCS+=	bugpoint.1 dsymutil.1 llc.1 lli.1 llvm-ar.1 llvm-as.1 \
 
 .if ${OPSYS} == FreeBSD && ${OSREL} == 10.3
 CFLAGS+=	-D_LIBCPP_TRIVIAL_PAIR_COPY_CTOR=1
+BROKEN=	Missing __cxa_thread_atexit
 .endif
 
 .if defined(WITH_DEBUG)
@@ -290,7 +287,11 @@ STRIP=
 .endif
 
 _CRTLIBDIR=	${LLVM_PREFIX:S|${PREFIX}/||}/lib/clang/${LLVM_RELEASE}/lib/freebsd
+_CRTBLDIR=	${LLVM_PREFIX:S|${PREFIX}/||}/share
+_COMPILER_RT_BLACKLISTS=	cfi_blacklist.txt
 .if ${ARCH} == "amd64"
+_COMPILER_RT_BLACKLISTS+=	asan_blacklist.txt
+_COMPILER_RT_BLACKLISTS+=	msan_blacklist.txt
 _COMPILER_RT_LIBS= \
 	libclang_rt.asan-preinit-x86_64.a \
 	libclang_rt.asan-x86_64.a \
@@ -304,6 +305,11 @@ _COMPILER_RT_LIBS= \
 	libclang_rt.fuzzer-x86_64.a \
 	libclang_rt.fuzzer_no_main-x86_64.a \
 	libclang_rt.lsan-x86_64.a \
+	libclang_rt.msan-x86_64.a \
+	libclang_rt.msan-x86_64.a.syms \
+	libclang_rt.msan_cxx-x86_64.a \
+	libclang_rt.msan_cxx-x86_64.a.syms \
+	libclang_rt.xray-x86_64.a \
 	libclang_rt.profile-x86_64.a \
 	libclang_rt.safestack-x86_64.a \
 	libclang_rt.stats-x86_64.a \
@@ -322,6 +328,7 @@ _COMPILER_RT_LIBS= \
 	libclang_rt.ubsan_standalone_cxx-x86_64.a.syms
 .endif
 .if ${ARCH} == "i386"
+_COMPILER_RT_BLACKLISTS+=	asan_blacklist.txt
 _COMPILER_RT_LIBS+= \
 	libclang_rt.asan-i386.a \
 	libclang_rt.asan-i386.so \
@@ -369,7 +376,7 @@ post-patch-CLANG-on:
 post-build-COMPILER_RT-on:
 	${MKDIR} ${WRKDIR}/compiler-rt-build
 	cd ${WRKDIR}/compiler-rt-build && \
-	${CMAKE_BIN} ${CMAKE_ARGS} \
+	${SETENV} ${CONFIGURE_ENV} ${CMAKE_BIN} ${CMAKE_ARGS} \
 	    -DLLVM_CONFIG_PATH=${CONFIGURE_WRKSRC}/bin/llvm-config \
 	    ${WRKSRC_compiler_rt} && \
 	${MAKE_ENV} ${MAKE_CMD}
@@ -383,7 +390,9 @@ post-install:
 .endfor
 
 post-install-DOCS-on:
-	${MV} ${STAGEDIR}${LLVM_PREFIX}/share/doc ${STAGEDIR}${DOCSDIR}
+	${MKDIR} ${STAGEDIR}${DOCSDIR}
+	${MV} ${STAGEDIR}${LLVM_PREFIX}/share/doc/* ${STAGEDIR}${DOCSDIR}
+	${RMDIR} ${STAGEDIR}${LLVM_PREFIX}/share/doc
 .for _man in ${MAN1SRCS}
 	${MV} ${STAGEDIR}${LLVM_PREFIX}/share/man/man1/${_man} \
 	    ${STAGEDIR}${MANPREFIX}/man/man1/${_man:R}${LLVM_SUFFIX}.1
@@ -434,9 +443,6 @@ post-install-LIT-on:
 	${LN} -f ${STAGEDIR}${LLVM_PREFIX}/bin/FileCheck \
 	    ${STAGEDIR}${PREFIX}/bin/FileCheck${LLVM_SUFFIX}
 
-post-install-LLDB-on:
-	${RMDIR} ${STAGEDIR}${LLVM_PREFIX}/include/lldb/API
-
 TEST_CMD=	'(cd ${WRKSRC}/test; ${SETENV} ${MAKE_ENV} LD_LIBRARY_PATH=${WRKSRC}/Release/lib ${MAKE_CMD} check-local-lit)'
 regression-test: ${BUILD_COOKIE}
 	if [ `${ID} -u` = 0 ]; then \
@@ -458,6 +464,7 @@ build-plist:
 	${ECHO_CMD} %%LIT%%${LLVM_PREFIX:S|${PREFIX}/||}/bin/${command} >> ${PLIST}.tmp
 .endfor
 	${FIND} ${STAGEDIR}${LLVM_PREFIX} -type f -o -type l | \
+	    ${GREP} -v '_blacklist.txt$$' | \
 	    ${GREP} -v '[/-]lit$$' | ${GREP} -v 'FileCheck$$' | \
 	    ${GREP} -v man/man1 | ${SED} -e 's|${STAGEDIR}${PREFIX}/||' \
 	    -e 's|${PYTHON_SITELIBDIR:C|${PREFIX}/||}|%%PYTHON_SITELIBDIR%%|' \

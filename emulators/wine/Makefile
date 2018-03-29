@@ -2,11 +2,11 @@
 # $FreeBSD$
 
 PORTNAME=	wine
-DISTVERSION=	2.0.4
+DISTVERSION=	3.0
 PORTEPOCH=	1
 CATEGORIES=	emulators
 MASTER_SITES=	SF/${PORTNAME}/Source \
-		http://ibiblio.org/pub/linux/system/emulators/wine/
+		http://mirrors.ibiblio.org/wine/source/3.0/
 
 MAINTAINER?=	gerald@FreeBSD.org
 COMMENT?=	Microsoft Windows compatibility environment
@@ -62,7 +62,7 @@ WINEMAKER_DESC=	Fully support winemaker (requires Perl)
 GECKO_DESC=	Bundle Gecko MSI package for Wine
 MONO_DESC=	Bundle Mono MSI package for Wine
 
-PORTSCOUT=	limit:^2\.0
+PORTSCOUT=	limit:^3\.0
 
 CUPS_CONFIGURE_WITH=	cups
 CUPS_LIB_DEPENDS=	libcups.so:print/cups
@@ -83,7 +83,7 @@ LDAP_USE=		OPENLDAP=yes
 LIBXSLT_CONFIGURE_WITH=	xslt
 LIBXSLT_LIB_DEPENDS=	libxslt.so:textproc/libxslt
 
-MONO_RUN_DEPENDS=	${DATADIR}/mono/wine-mono-4.6.4.msi:emulators/wine-mono
+MONO_RUN_DEPENDS=	${DATADIR}/mono/wine-mono-4.7.1.msi:emulators/wine-mono-devel
 
 MPG123_CONFIGURE_WITH=	mpg123
 MPG123_LIB_DEPENDS=	libmpg123.so:audio/mpg123
@@ -108,7 +108,7 @@ X11_LIB_DEPENDS=	libfontconfig.so:x11-fonts/fontconfig \
 .include <bsd.port.pre.mk>
 
 # PR224863: clang 6.0.0 crashes
-.if ${OPSYS} == FreeBSD && ${OSVERSION} >= 1200056 && ${ARCH} == amd64
+.if ${OPSYS} == FreeBSD && ${OSVERSION} == 1200056 && ${ARCH} == amd64
 USE_GCC=	yes
 .endif
 

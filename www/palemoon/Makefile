@@ -2,9 +2,8 @@
 # $FreeBSD$
 
 PORTNAME=	palemoon
-DISTVERSION=	27.7.0
+DISTVERSION=	27.8.2
 DISTVERSIONSUFFIX=_Release
-PORTREVISION=	1
 CATEGORIES=	www ipv6
 
 MAINTAINER=	lichray@gmail.com
@@ -37,7 +36,6 @@ PM_ICON=	${PORTNAME}.png
 PM_ICON_SRC=	${PREFIX}/lib/${PORTNAME}/browser/icons/mozicon128.png
 PM_DESKTOP=	${WRKSRC}/browser/branding/official/${PORTNAME}.desktop
 MOZ_OPTIONS=	--enable-application=browser \
-		--enable-official-branding \
 		--enable-devtools \
 		--enable-jemalloc \
 		--enable-jemalloc-lib

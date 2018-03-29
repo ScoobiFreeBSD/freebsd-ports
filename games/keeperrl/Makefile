@@ -2,9 +2,10 @@
 
 PORTNAME=	keeperrl
 PORTVERSION=	0.0.${ALPHA_VERSION}
+PORTREVISION=	1
 CATEGORIES=	games
 
-MAINTAINER=	pawel@FreeBSD.org
+MAINTAINER=	games@FreeBSD.org
 COMMENT=	Ambitious dungeon builder with roguelike elements
 
 LICENSE=	GPLv2 OFL11

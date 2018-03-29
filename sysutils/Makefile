@@ -6,6 +6,7 @@
     SUBDIR += 3dm
     SUBDIR += 44bsd-more
     SUBDIR += 915resolution
+    SUBDIR += DTraceToolkit
     SUBDIR += LPRng
     SUBDIR += LPRngTool
     SUBDIR += UEFITool
@@ -39,6 +40,7 @@
     SUBDIR += ansible
     SUBDIR += ansible1
     SUBDIR += ansible23
+    SUBDIR += ansible24
     SUBDIR += anvil
     SUBDIR += apachetop
     SUBDIR += apcpwr
@@ -49,6 +51,7 @@
     SUBDIR += areca-cli
     SUBDIR += ascpu
     SUBDIR += asfsm
+    SUBDIR += asmctl
     SUBDIR += asmem
     SUBDIR += asmon
     SUBDIR += asusoled
@@ -79,8 +82,8 @@
     SUBDIR += bacula9-client-static
     SUBDIR += bacula9-docs
     SUBDIR += bacula9-server
-    SUBDIR += baloo
-    SUBDIR += baloo-widgets
+    SUBDIR += baloo-kde4
+    SUBDIR += baloo-widgets-kde4
     SUBDIR += bamf
     SUBDIR += bareos-bat
     SUBDIR += bareos-client
@@ -145,6 +148,7 @@
     SUBDIR += cfengine-masterfiles37
     SUBDIR += cfengine-masterfiles38
     SUBDIR += cfengine-masterfiles39
+    SUBDIR += cfengine-masterfiles-devel
     SUBDIR += cfengine22
     SUBDIR += cfengine310
     SUBDIR += cfengine311
@@ -156,6 +160,7 @@
     SUBDIR += cfengine37
     SUBDIR += cfengine38
     SUBDIR += cfengine39
+    SUBDIR += cfengine-devel
     SUBDIR += chgrep
     SUBDIR += chyves
     SUBDIR += cinnamon-control-center
@@ -188,6 +193,7 @@
     SUBDIR += consolekit2
     SUBDIR += consul
     SUBDIR += consul-alerts
+    SUBDIR += consul-replicate
     SUBDIR += consul_exporter
     SUBDIR += container-diff
     SUBDIR += contractor
@@ -200,6 +206,7 @@
     SUBDIR += cpuburn
     SUBDIR += cpuid
     SUBDIR += cpulimit
+    SUBDIR += cpupdate
     SUBDIR += cramfs
     SUBDIR += crashme
     SUBDIR += createrepo
@@ -209,7 +216,6 @@
     SUBDIR += curly
     SUBDIR += currtime
     SUBDIR += cw
-    SUBDIR += DTraceToolkit
     SUBDIR += daa2iso
     SUBDIR += dae
     SUBDIR += daemonize
@@ -312,6 +318,7 @@
     SUBDIR += file
     SUBDIR += filedupe
     SUBDIR += filelight
+    SUBDIR += filelight-kde4
     SUBDIR += fileprune
     SUBDIR += fileschanged
     SUBDIR += filetype
@@ -363,6 +370,7 @@
     SUBDIR += fusefs-gnome-vfs
     SUBDIR += fusefs-gstfs
     SUBDIR += fusefs-gunzip
+    SUBDIR += fusefs-hfsfuse
     SUBDIR += fusefs-httpfs
     SUBDIR += fusefs-ifuse
     SUBDIR += fusefs-libs
@@ -371,6 +379,7 @@
     SUBDIR += fusefs-mhddfs
     SUBDIR += fusefs-mp3fs
     SUBDIR += fusefs-ntfs
+    SUBDIR += fusefs-ntfs-compression
     SUBDIR += fusefs-pod
     SUBDIR += fusefs-rar2fs
     SUBDIR += fusefs-s3fs
@@ -381,6 +390,7 @@
     SUBDIR += fusefs-sshfs
     SUBDIR += fusefs-unionfs
     SUBDIR += fusefs-wdfs
+    SUBDIR += fusefs-webdavfs
     SUBDIR += fusefs-wikipediafs
     SUBDIR += fusefs-zip
     SUBDIR += fvcool
@@ -400,6 +410,7 @@
     SUBDIR += geomWatch
     SUBDIR += getdelta
     SUBDIR += geteltorito
+    SUBDIR += getssl
     SUBDIR += gigolo
     SUBDIR += gkfreq
     SUBDIR += gkleds2
@@ -446,6 +457,7 @@
     SUBDIR += hal
     SUBDIR += hal-info
     SUBDIR += hardlink
+    SUBDIR += hare
     SUBDIR += hatop
     SUBDIR += hdrecover
     SUBDIR += healthd
@@ -522,24 +534,24 @@
     SUBDIR += k3b-kde4
     SUBDIR += k8temp
     SUBDIR += kcm-polkit-kde
-    SUBDIR += kcron
-    SUBDIR += kdeadmin4
-    SUBDIR += kdf
+    SUBDIR += kcron-kde4
+    SUBDIR += kdeadmin-kde4
+    SUBDIR += kdf-kde4
     SUBDIR += kdirstat
     SUBDIR += keyboard-daemon
     SUBDIR += kf5-baloo
     SUBDIR += kf5-kwallet
-    SUBDIR += kfilemetadata
-    SUBDIR += kfloppy
+    SUBDIR += kfilemetadata-kde4
+    SUBDIR += kfloppy-kde4
     SUBDIR += kiconvtool
     SUBDIR += kldfind
     SUBDIR += kldpatch
     SUBDIR += knutclient-kde4
-    SUBDIR += krename-kde4
+    SUBDIR += krename
     SUBDIR += kshutdown-kde4
-    SUBDIR += ksysguardd
-    SUBDIR += ksystemlog
-    SUBDIR += kuser
+    SUBDIR += ksysguardd-kde4
+    SUBDIR += ksystemlog-kde4
+    SUBDIR += kuser-kde4
     SUBDIR += lava
     SUBDIR += lbl-cf
     SUBDIR += lbl-hf
@@ -565,18 +577,24 @@
     SUBDIR += lineak-xosdplugin
     SUBDIR += lineakd
     SUBDIR += linrename
+    SUBDIR += linux-c6-lttng-ust
+    SUBDIR += linux-c6-userspace-rcu
+    SUBDIR += linux-c7-lttng-ust
+    SUBDIR += linux-c7-userspace-rcu
     SUBDIR += linux-crashplan
     SUBDIR += linuxfdisk
     SUBDIR += livecd
     SUBDIR += lmmon
     SUBDIR += lmon
     SUBDIR += lnav
+    SUBDIR += lockfile-progs
     SUBDIR += log_analysis
     SUBDIR += logrotate
     SUBDIR += logstalgia
     SUBDIR += logstash
     SUBDIR += logstash-forwarder
     SUBDIR += logstash5
+    SUBDIR += logstash6
     SUBDIR += logtool
     SUBDIR += logwatch
     SUBDIR += lookat
@@ -592,6 +610,8 @@
     SUBDIR += lxsplit
     SUBDIR += lxtask
     SUBDIR += lxterminal
+    SUBDIR += mac_nonet
+    SUBDIR += mac_rtprio
     SUBDIR += magicrescue
     SUBDIR += manck
     SUBDIR += mapchan
@@ -672,6 +692,7 @@
     SUBDIR += mountsmb2
     SUBDIR += mpiexec
     SUBDIR += mptd
+    SUBDIR += msiklm
     SUBDIR += msktutil
     SUBDIR += msyslog
     SUBDIR += mtpfs
@@ -691,8 +712,8 @@
     SUBDIR += ncdu
     SUBDIR += ndmpd
     SUBDIR += neofetch
-    SUBDIR += nepomuk-core
-    SUBDIR += nepomuk-widgets
+    SUBDIR += nepomuk-core-kde4
+    SUBDIR += nepomuk-widgets-kde4
     SUBDIR += nfcutils
     SUBDIR += nfsping
     SUBDIR += nitrogen
@@ -844,6 +865,7 @@
     SUBDIR += php71-posix
     SUBDIR += php72-fileinfo
     SUBDIR += php72-posix
+    SUBDIR += phpfpm_exporter
     SUBDIR += phybs
     SUBDIR += pick
     SUBDIR += pidof
@@ -908,8 +930,10 @@
     SUBDIR += py-gmailfs-fuse
     SUBDIR += py-google-compute-engine
     SUBDIR += py-halite
+    SUBDIR += py-hared
     SUBDIR += py-honcho
     SUBDIR += py-iowait
+    SUBDIR += py-mqttwarn
     SUBDIR += py-nagiosplugin
     SUBDIR += py-nomad
     SUBDIR += py-pkginfo
@@ -937,7 +961,6 @@
     SUBDIR += py-tmuxp
     SUBDIR += py-uptime
     SUBDIR += py-zdaemon
-    SUBDIR += py-zfs
     SUBDIR += pydf
     SUBDIR += qchroot
     SUBDIR += qdirstat
@@ -995,7 +1018,6 @@
     SUBDIR += rtty
     SUBDIR += rubygem-backup
     SUBDIR += rubygem-bosh-gen
-    SUBDIR += rubygem-bosh_cli
     SUBDIR += rubygem-bundler
     SUBDIR += rubygem-bundler_ext
     SUBDIR += rubygem-capistrano
@@ -1028,7 +1050,6 @@
     SUBDIR += rubygem-hiera
     SUBDIR += rubygem-hiera-eyaml
     SUBDIR += rubygem-hiera-file
-    SUBDIR += rubygem-hiera1
     SUBDIR += rubygem-hieracles
     SUBDIR += rubygem-httplog
     SUBDIR += rubygem-itamae
@@ -1070,6 +1091,7 @@
     SUBDIR += rubygem-yell
     SUBDIR += rundeck
     SUBDIR += runit
+    SUBDIR += runit-faster
     SUBDIR += runwhen
     SUBDIR += s6
     SUBDIR += s6-rc
@@ -1083,6 +1105,7 @@
     SUBDIR += sas3ircu
     SUBDIR += savelogs
     SUBDIR += sb16config
+    SUBDIR += sbase
     SUBDIR += sbsigntool
     SUBDIR += scalpel
     SUBDIR += scan_ffs
@@ -1109,6 +1132,7 @@
     SUBDIR += shmcat
     SUBDIR += showbeastie
     SUBDIR += siegfried
+    SUBDIR += signon-plugin-oauth2
     SUBDIR += signon-qt5
     SUBDIR += signon-ui
     SUBDIR += skill
@@ -1122,6 +1146,7 @@
     SUBDIR += smenu
     SUBDIR += smp_utils
     SUBDIR += snap
+    SUBDIR += snmp_exporter
     SUBDIR += snooze
     SUBDIR += snowlog
     SUBDIR += socket
@@ -1146,7 +1171,7 @@
     SUBDIR += swapd
     SUBDIR += swapexd
     SUBDIR += swapmon
-    SUBDIR += sweeper
+    SUBDIR += sweeper-kde4
     SUBDIR += symlinks
     SUBDIR += symon
     SUBDIR += synergy
@@ -1161,6 +1186,7 @@
     SUBDIR += syslog-ng311
     SUBDIR += syslog-ng312
     SUBDIR += syslog-ng313
+    SUBDIR += syslog-ng314
     SUBDIR += syslog-ng36
     SUBDIR += syslog-ng37
     SUBDIR += syslog-ng39
@@ -1194,6 +1220,7 @@
     SUBDIR += tmpwatch
     SUBDIR += tmux
     SUBDIR += tmux-mem-cpu-load
+    SUBDIR += tmux23
     SUBDIR += topless
     SUBDIR += torque
     SUBDIR += toshctl
@@ -1228,6 +1255,7 @@
     SUBDIR += u-boot-olimex-a20-som-evb
     SUBDIR += u-boot-olinuxino-lime
     SUBDIR += u-boot-orangepi-one
+    SUBDIR += u-boot-orangepi-pc
     SUBDIR += u-boot-orangepi-pc2
     SUBDIR += u-boot-orangepi-plus-2e
     SUBDIR += u-boot-orangepi-zero

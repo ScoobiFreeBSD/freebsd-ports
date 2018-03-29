@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	scudcloud
-PORTVERSION=	1.64
+PORTVERSION=	1.65
 DISTVERSIONPREFIX=	v
 CATEGORIES=	net-im
 
@@ -30,6 +30,7 @@ OPTIONS_DEFINE=	HUNSPELL
 USES=		python:3.4+
 USE_GITHUB=	yes
 USE_PYTHON=	autoplist distutils optsuffix
+NO_ARCH=	yes
 
 post-patch:
 		@${REINPLACE_CMD} -i.bak -e 's,%%LOCALBASE%%,${LOCALBASE},1' \

@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	qtum
-PORTVERSION=	0.14.13
+PORTVERSION=	0.14.15
 DISTVERSIONPREFIX=	mainnet-ignition-v
 CATEGORIES=	net-p2p finance
 
@@ -10,6 +10,8 @@ MAINTAINER=	vd@FreeBSD.org
 COMMENT=	PoS cryptocurrency that can execute smart contract as part of an UTXO
 
 LICENSE=	GPLv3
+
+BROKEN_i386=	does not compile: invalid operand for instruction ... ASJ(jnz, 0, b) ... "jnz"
 
 BUILD_DEPENDS=	libzmq4>0:net/libzmq4
 RUN_DEPENDS=	libzmq4>0:net/libzmq4
@@ -34,14 +36,11 @@ CONFIGURE_ARGS=	--disable-man \
 		--with-qrencode \
 		--without-libs
 
-USES=		autoreconf bdb:5 compiler:c++11-lib gmake libtool pkgconfig ssl
+USES=		autoreconf bdb:5+ compiler:c++11-lib gmake libtool pkgconfig ssl
 USE_QT5=	buildtools core dbus gui linguisttools network testlib widgets
 USE_GITHUB=	yes
-GH_ACCOUNT=	qtumproject
-GH_PROJECT=	qtum
-# Add extra account:project:tag:meaninglessgroupname/sub/dir via GH_TUPLE
-# for the one git submodule used by Qtum.
-GH_TUPLE=	qtumproject:cpp-eth-qtum:488ccdc7cef0a0b4fa54c8:cppeth/src/cpp-ethereum
+GH_TUPLE=	qtumproject:qtum:${DISTVERSIONPREFIX}${PORTVERSION} \
+		qtumproject:cpp-eth-qtum:6e3173715867f5de56d6aa:cppeth/src/cpp-ethereum
 
 .include <bsd.port.pre.mk>
 
